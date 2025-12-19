@@ -20,4 +20,5 @@
     "nativewind-env.d.ts",
     ".expo/types/**/*.ts"
   ],
+  "extends": "expo/tsconfig.base"
 }
