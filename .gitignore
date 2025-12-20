@@ -87,3 +87,7 @@ build/
 
 # Build artifacts from bundlers
 bundle/
+
+# TODO md file local
+*.todo.md
+todo.md

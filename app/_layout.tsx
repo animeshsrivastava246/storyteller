@@ -1,5 +1,14 @@
-import { Stack } from "expo-router";
+import { Slot } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 
 export default function RootLayout() {
-  return <Stack />;
+  return (
+    <>
+      <StatusBar
+        style="auto"
+        translucent
+      />
+      <Slot />
+    </>
+  );
 }
