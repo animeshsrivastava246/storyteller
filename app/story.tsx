@@ -89,7 +89,7 @@ export default function Story() {
                   <Image source={{ uri: imgUrls[index] }} resizeMode="cover" className="w-full h-[450px] rounded-2xl shadow bg-gray-200" />) : null
               )
             }
-            <Text className="text-lg">{" "}{currentLine?.text ?? "Unable to generate your imagination. :("}{" "}</Text>
+            <Text className="text-lg">{"\n"}{currentLine?.text ?? "Unable to generate your imagination. :("}{"\n"}</Text>
           </ScrollView>
 
           {/* Navigation Buttons */}

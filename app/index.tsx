@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { Alert, ImageBackground, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, ImageBackground, Pressable, Text, TextInput, View } from "react-native";
 import "../global.css";
 
 export default function HomeScreen() {
@@ -59,7 +59,7 @@ export default function HomeScreen() {
               scrollEnabled={true}
             />
           </View>
-          <TouchableOpacity
+          <Pressable
             disabled={thinking}
             onPress={onGenerate}
             className="bg-sky-700 justify-center items-center p-4 rounded-full"
@@ -67,7 +67,7 @@ export default function HomeScreen() {
             <Text className="text-white text-xl font-bold">
               {thinking ? "Thinking..." : "Generate My Story"}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
     </ImageBackground>
