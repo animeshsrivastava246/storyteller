@@ -1,3 +1,4 @@
+import { saveStory } from "@/utils/history";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Alert, ImageBackground, Pressable, Text, TextInput, View } from "react-native";
@@ -6,7 +7,6 @@ import "../global.css";
 export default function HomeScreen() {
   const [seed, setSeed] = useState("");
   const [thinking, setThinking] = useState(false);
-
   const onGenerate = async () => {
     if (!seed.trim()) {
       Alert.alert("Please enter a seed sentence.");
@@ -29,6 +29,7 @@ export default function HomeScreen() {
         pathname: "/story",
         params: { story: JSON.stringify(data.story) },
       });
+      await saveStory(seed, data.story);
     } catch (e) {
       Alert.alert("Oops :( Something went wrong. Please try again!", (e as Error).message);
 

@@ -5,8 +5,10 @@ export async function POST(request: Request) {
         if (!prompt) {
             return new Response(JSON.stringify({ error: "Prompt is required!" }), { status: 400, headers });
         }
-        const url = process.env.IMG_API_URL;
-        const token = process.env.IMG_API_TOKEN;
+        // const url = process.env.EXPO_PUBLIC_IMG_API_URL;
+        // const token = process.env.EXPO_PUBLIC_IMG_API_TOKEN;
+        const url = "https://image-generator.animeshsrivastava246246.workers.dev";
+        const token = "d9B/N<,XjKAWDGkS6rl=0hVe|U]y^";
         if (!url || !token) {
             return new Response(JSON.stringify({ error: "Image API URL or Token is not configured." }), { status: 500, headers });
         }

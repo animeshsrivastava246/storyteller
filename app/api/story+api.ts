@@ -7,12 +7,11 @@ type StoryLine = {
 
 export async function POST(request: Request) {
   const headers = { "Content-Type": "application/json" };
-
   try {
     const { seed } = (await request.json()) as { seed?: string };
     if (!seed) return new Response(JSON.stringify({ error: "Missing 'seed' in request body" }), { status: 400, headers });
 
-    const apiKey = process.env.GOOGLE_GENAI_API_KEY;
+    const apiKey = process.env.EXPO_PUBLIC_GOOGLE_GENAI_API_KEY;
     if (!apiKey) return new Response(JSON.stringify({ error: "API key not configured" }), { status: 500, headers });
 
     const ai = new GoogleGenAI({ apiKey });
