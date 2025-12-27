@@ -1,24 +1,16 @@
-// app/_layout.tsx — tab-based root
-import { Tabs } from 'expo-router/tabs';
-import { Icon, Label } from 'expo-router/unstable-native-tabs';
+import { Icon, Label, NativeTabs } from 'expo-router/unstable-native-tabs';
 
 export default function TabLayout() {
   return (
-    <Tabs>
-      <Tabs.Screen
-        name="index"
-        options={{
-          tabBarLabel: 'Create',
-          tabBarIcon: ({ color }) => <Icon sf="star.fill" />,
-        }}
-      />
-      <Tabs.Screen
-        name="history"
-        options={{
-          tabBarLabel: 'History',
-          tabBarIcon: ({ color }) => <Icon sf="clock.fill" />,
-        }}
-      />
-    </Tabs>
+    <NativeTabs>
+      <NativeTabs.Trigger name="index" >
+        <Label>Home</Label>
+        <Icon sf="house" drawable="custom_home_drawable"/>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="story">
+        <Icon sf="book.badge.plus" drawable="custom_home_drawable"/>
+        <Label>Story</Label>
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }
