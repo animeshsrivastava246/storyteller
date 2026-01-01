@@ -123,6 +123,7 @@ export default function Story() {
         resizeMode="cover"
         imageStyle={{ opacity: 0.3 }}
         className="flex-1"
+        blurRadius={4}
       >
         <View className="flex-1 pt-12 pb-8 px-4">
           {/* Back */}

@@ -143,6 +143,19 @@ export default function HomeScreen() {
                 {isGenerating ? "Generating…" : "Generate Story"}
               </Text>
             </Pressable>
+            {/* Test Screen */}
+            <Pressable
+              onPress={() => router.push({
+                pathname: "/test",
+              })}
+              className="mt-8 rounded-2xl py-4 items-center 
+                bg-white /20
+                "
+            >
+              <Text className="text-black font-semibold text-2xl">
+                Test
+              </Text>
+            </Pressable>
 
             {/* Footer hint */}
             <Text className="mt-6 text-center text-white/40 text-sm">
@@ -150,7 +163,7 @@ export default function HomeScreen() {
             </Text>
           </ScrollView>
         </KeyboardAvoidingView>
-      </View>
+      </View >
     </>
   );
 }

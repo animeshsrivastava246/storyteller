@@ -40,6 +40,16 @@ export default function RootLayout() {
           contentStyle: { backgroundColor: "transparent" },
         }}
       />
+
+      {/* Test */}
+      <Stack.Screen
+        name="test"
+        options={{
+          headerShown: true,
+          headerTransparent: true,
+          headerTitle: "",
+        }}
+      />
     </Stack>
   );
 }
