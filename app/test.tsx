@@ -1,53 +1,44 @@
-import { ImageBackground, StyleSheet } from "react-native";
+import { useEffect, useRef } from "react";
+import { Animated, Easing, ImageBackground, StyleSheet } from "react-native";
 
 export default function AboutScreen() {
+  // Create a reference for the scale animation
+  const scaleAnim = useRef(new Animated.Value(8)).current;
 
-    return (
-        <>
+  // Start the animation when the component mounts
+  useEffect(() => {
+    Animated.timing(scaleAnim, {
+      toValue: 1.2, // Target scale value
+      duration: 1400, // Duration of the animation
+      easing: Easing.elastic(0.75), // Easing function for smooth animation
+      useNativeDriver: true, // Use the native driver for better performance
+    }).start();
+  }, [scaleAnim]);
 
-            <ImageBackground
-                source={require("../assets/storyteller-hero-landing.jpeg")}
-                style={styles.background}
-                resizeMode="cover"
-                blurRadius={4}
-            >
-                {/* <View style={styles.overlay}>
-                    <Text style={styles.title}>About Page</Text>
-
-                    <Pressable style={styles.button} onPress={() => router.push("/")}>
-                        <Text style={styles.buttonText}>Go Home</Text>
-                    </Pressable>
-                </View> */}
-            </ImageBackground>
-        </>
-    );
+  return (
+    <Animated.View
+      style={[styles.container, { transform: [{ scale: scaleAnim }] }]}
+    >
+      <ImageBackground
+        // source={require("../assets/storyteller-hero-landing.jpeg")}
+        source={require("../assets/chateau.jpeg")}
+        style={styles.background}
+        resizeMode="cover"
+        blurRadius={4}
+      />
+    </Animated.View>
+  );
 }
 
 const styles = StyleSheet.create({
-    background: {
-        flex: 1,
-        justifyContent: "center",
-    },
-    // overlay: {
-    //     alignItems: "center",
-    //     backgroundColor: "rgba(0,0,0,0.4)",
-    //     padding: 20,
-    // },
-    // title: {
-    //     fontSize: 28,
-    //     color: "#fff",
-    //     marginBottom: 20,
-    //     fontWeight: "bold",
-    // },
-    // button: {
-    //     backgroundColor: "#ffffff00",
-    //     paddingVertical: 12,
-    //     paddingHorizontal: 24,
-    //     borderRadius: 8,
-    // },
-    // buttonText: {
-    //     color: "#fff",
-    //     fontSize: 16,
-    //     fontWeight: "600",
-    // },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center", // Center content for animation
+  },
+  background: {
+    flex: 1,
+    width: "100%", // Ensure the background takes full width
+    height: "100%", // Ensure the background takes full height
+  },
 });
