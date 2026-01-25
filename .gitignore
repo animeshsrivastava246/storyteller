@@ -88,6 +88,7 @@ build/
 # Build artifacts from bundlers
 bundle/
 
-# TODO md file local
+# TODO md file local and more general ignores
 *.todo.md
 todo.md
+AGENTS.md

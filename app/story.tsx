@@ -1,56 +1,52 @@
-// story.tsx (enhanced)
 import { HeaderIconButton } from "@/components/HeaderIconButton";
-import Entypo from "@expo/vector-icons/Entypo";
+import type { StoryLine } from "@/types/story";
+import { getLatestStory } from "@/utils/history";
+import { cacheImage, getCachedImage } from "@/utils/imageCache";
+import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { router, Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
   Image,
   ImageBackground,
   Pressable,
-  ScrollView,
   Text,
   View,
 } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-export function useIndexHeader() {
-  return {
-    headerRight: () => (
-      <HeaderIconButton
-        icon="time-outline"
-        onPress={() => router.push("/history")}
-      />
-    ),
-  };
-}
-
-type StoryLine = {
-  text: string;
-  prompt: string;
-};
 
 const { width } = Dimensions.get("window");
+const IMAGE_WIDTH = width - 48;
+const IMAGE_HEIGHT = IMAGE_WIDTH * 0.75;
 
 export default function Story() {
   const router = useRouter();
-  const { story: storyParam } = useLocalSearchParams<{ story?: string }>();
+  const { story: storyParam, id } = useLocalSearchParams<{ story?: string; id?: string }>();
 
   const [index, setIndex] = useState(0);
+  const [lines, setLines] = useState<StoryLine[]>([]);
   const [imgUrls, setImgUrls] = useState<(string | null)[]>([]);
   const [isLoadingImages, setIsLoadingImages] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const lines: StoryLine[] = useMemo(() => {
-    if (!storyParam) return [];
-    try {
-      return JSON.parse(storyParam);
-    } catch (e) {
-      console.error("Invalid story JSON", storyParam);
-      return [];
-    }
-  }, [storyParam]);
+  // Load story from param or fetch latest from DB
+  useEffect(() => {
+    const loadStory = async () => {
+      if (storyParam) {
+        try {
+          setLines(JSON.parse(storyParam));
+        } catch {
+          console.error("Invalid story JSON", storyParam);
+        }
+      } else if (id) {
+        const latest = await getLatestStory();
+        if (latest) setLines(latest.story);
+      }
+    };
+    loadStory();
+  }, [storyParam, id]);
 
   const currentLine = lines[index];
   const currentImgUrl = imgUrls[index];
@@ -62,7 +58,12 @@ export default function Story() {
 
     try {
       const urls = await Promise.allSettled(
-        lines.map(async (line, i) => {
+        lines.map(async (line) => {
+          // Check cache first
+          const cached = await getCachedImage(line.prompt);
+          if (cached) return cached;
+
+          // Fetch from API
           const res = await fetch("/api/image", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -75,15 +76,19 @@ export default function Story() {
           }
 
           const { imgUrl } = await res.json();
+          
+          // Cache the image
+          await cacheImage(line.prompt, imgUrl);
+          
           return imgUrl;
         })
       );
 
       const newUrls = urls.map((result) => (result.status === "fulfilled" ? result.value : null));
       setImgUrls(newUrls);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Image loading failed:", err);
-      setError(err.message || "Failed to load images");
+      setError(err instanceof Error ? err.message : "Failed to load images");
     } finally {
       setIsLoadingImages(false);
     }
@@ -119,156 +124,183 @@ export default function Story() {
         }}
       />
       <ImageBackground
-        source={require("../assets/images/bg.webp")}
+        source={require("@/assets/images/bg.webp")}
         resizeMode="cover"
-        imageStyle={{ opacity: 0.3 }}
         className="flex-1"
-        blurRadius={4}
       >
-        <View className="flex-1 pt-12 pb-8 px-4">
-          {/* Back */}
+        <LinearGradient
+          colors={["rgba(0,0,0,0.3)", "rgba(0,0,0,0.5)"]}
+          className="flex-1"
+        >
+          {/* Back Button - Liquid Glass */}
           <Pressable
             onPress={() => router.back()}
-            className="absolute top-12 left-4 z-10 bg-white/70 backdrop-blur-lg size-12 rounded-full items-center justify-center shadow-md border border-white/20"
+            className="absolute top-14 left-4 z-10 size-11 rounded-full items-center justify-center"
+            style={{
+              backgroundColor: "rgba(255,255,255,0.15)",
+              borderWidth: 1,
+              borderColor: "rgba(255,255,255,0.2)",
+            }}
           >
-            <Entypo name="chevron-left" size={27} color="#1e40af" />
+            <Ionicons name="chevron-back" size={24} color="white" />
           </Pressable>
 
-          {/* Content */}
-          <ScrollView
-            contentContainerClassName="items-center gap-8 pb-20"
-            className="mt-16"
-            keyboardShouldPersistTaps="handled"
-          >
-            {/* Loading / Error */}
+          {/* Main Content */}
+          <View className="flex-1 justify-center items-center px-6 pt-20 pb-32">
             {isLoadingImages ? (
-              <View className="items-center justify-center py-12 gap-4">
-                <ActivityIndicator size="large" color="#3b82f6" />
-                <Text className="text-lg font-medium text-slate-600 text-center px-8">
-                  Painting your story’s scenes...
+              <View
+                className="rounded-3xl items-center justify-center p-8"
+                style={{
+                  backgroundColor: "rgba(255,255,255,0.1)",
+                  borderWidth: 1,
+                  borderColor: "rgba(255,255,255,0.2)",
+                  width: IMAGE_WIDTH,
+                }}
+              >
+                <ActivityIndicator size="large" color="white" />
+                <Text className="text-lg font-medium text-white text-center mt-4">
+                  Painting your story&apos;s scenes...
                 </Text>
-                <Text className="text-sm text-slate-500 text-center px-6">
-                  This may take 10–20 seconds. Please wait 🎨
+                <Text className="text-sm text-white/60 text-center mt-2">
+                  This may take a moment 🎨
                 </Text>
               </View>
             ) : error ? (
-              <View className="items-center justify-center py-12 gap-3 px-6">
-                <Text className="text-red-500 text-center">❌ {error}</Text>
+              <View
+                className="rounded-3xl items-center justify-center p-8"
+                style={{
+                  backgroundColor: "rgba(255,255,255,0.1)",
+                  borderWidth: 1,
+                  borderColor: "rgba(255,255,255,0.2)",
+                  width: IMAGE_WIDTH,
+                }}
+              >
+                <Text className="text-red-400 text-center mb-4">❌ {error}</Text>
                 <Pressable
                   onPress={loadImages}
-                  className="bg-rose-600 px-6 py-3 rounded-full mt-2"
+                  className="bg-white/20 px-6 py-3 rounded-full border border-white/30"
                 >
                   <Text className="text-white font-semibold">Retry</Text>
                 </Pressable>
               </View>
             ) : (
-              <>
-                {/* Image */}
-                {currentImgUrl ? (
-                  <Animated.View entering={FadeIn.duration(400)} exiting={FadeOut.duration(300)}>
+              <Animated.View
+                entering={FadeIn.duration(400)}
+                exiting={FadeOut.duration(300)}
+                className="items-center"
+              >
+                {/* Image Card */}
+                <View
+                  style={{
+                    borderRadius: 24,
+                    overflow: "hidden",
+                    borderWidth: 1,
+                    borderColor: "rgba(255,255,255,0.2)",
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 12 },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 24,
+                  }}
+                >
+                  {currentImgUrl ? (
                     <Image
                       source={{ uri: currentImgUrl }}
                       resizeMode="cover"
-                      style={{
-                        width: width - 48,
-                        height: (width - 48) * 0.75, // 4:3
-                        borderRadius: 24,
-                        borderWidth: 1,
-                        borderColor: "rgba(255,255,255,0.2)",
-                        shadowColor: "#000",
-                        shadowOffset: { width: 0, height: 8 },
-                        shadowOpacity: 0.15,
-                        shadowRadius: 20,
-                      }}
+                      style={{ width: IMAGE_WIDTH, height: IMAGE_HEIGHT }}
                     />
-                  </Animated.View>
-                ) : (
-                  <View
-                    style={{
-                      width: width - 48,
-                      height: (width - 48) * 0.75,
-                      borderRadius: 24,
-                      backgroundColor: "rgba(241,245,249,0.8)",
-                      borderWidth: 1,
-                      borderColor: "rgba(0,0,0,0.05)",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Text className="text-gray-500 text-center px-8">
-                      Image failed to load. Retrying...
-                    </Text>
-                  </View>
-                )}
+                  ) : (
+                    <View
+                      style={{
+                        width: IMAGE_WIDTH,
+                        height: IMAGE_HEIGHT,
+                        backgroundColor: "rgba(255,255,255,0.1)",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text className="text-white/60 text-center px-8">
+                        Image loading...
+                      </Text>
+                    </View>
+                  )}
+                </View>
 
-                {/* Text */}
-                <Animated.View entering={FadeIn.delay(300).duration(500)}>
-                  <LinearGradient
-                    colors={["transparent", "rgba(0,0,0,0.3)", "rgba(0,0,0,0.6)"]}
-                    style={{
-                      position: "absolute",
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      height: 120,
-                      borderRadius: 24,
-                    }}
-                    start={{ x: 0.5, y: 0 }}
-                    end={{ x: 0.5, y: 1 }}
-                  />
-                  <View className="absolute bottom-6 px-6 w-full">
-                    <Text className="text-white text-xl font-semibold text-center leading-relaxed">
-                      {currentLine?.text || "✨ Your imagination, visualized."}
-                    </Text>
-                  </View>
-                </Animated.View>
-              </>
+                {/* Story Text - Glass Card */}
+                <View
+                  className="mt-6 rounded-2xl px-6 py-4"
+                  style={{
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                    borderWidth: 1,
+                    borderColor: "rgba(255,255,255,0.2)",
+                    width: IMAGE_WIDTH,
+                  }}
+                >
+                  <Text className="text-white text-lg font-medium text-center leading-relaxed">
+                    {currentLine?.text || "✨ Your imagination, visualized."}
+                  </Text>
+                </View>
+              </Animated.View>
             )}
-          </ScrollView>
+          </View>
 
-          {/* Navigation Controls (Liquid Glass Style) */}
-          <View className="absolute bottom-6 left-4 right-4">
-            <View className="flex-row justify-between items-center">
+          {/* Navigation Controls - Liquid Glass */}
+          <View className="absolute bottom-8 left-4 right-4">
+            <View
+              className="flex-row items-center justify-between rounded-2xl p-2"
+              style={{
+                backgroundColor: "rgba(255,255,255,0.1)",
+                borderWidth: 1,
+                borderColor: "rgba(255,255,255,0.2)",
+              }}
+            >
               <Pressable
                 disabled={isAtStart || !canNavigate}
                 onPress={onPrevious}
-                className={`flex-1 py-4 rounded-2xl justify-center items-center mx-1 ${isAtStart || !canNavigate
-                  ? "bg-gray-200/50"
-                  : "bg-white/60 backdrop-blur-xl border border-white/20 shadow-lg"
-                  }`}
+                className="flex-1 py-3 rounded-xl items-center justify-center flex-row gap-2"
+                style={{
+                  backgroundColor: isAtStart || !canNavigate ? "transparent" : "rgba(255,255,255,0.15)",
+                }}
               >
+                <Ionicons
+                  name="chevron-back"
+                  size={18}
+                  color={isAtStart || !canNavigate ? "rgba(255,255,255,0.3)" : "white"}
+                />
                 <Text
-                  className={`font-bold ${isAtStart || !canNavigate ? "text-gray-400" : "text-slate-700"
-                    }`}
+                  className={`font-semibold ${isAtStart || !canNavigate ? "text-white/30" : "text-white"}`}
                 >
-                  ◀ Previous
+                  Previous
                 </Text>
               </Pressable>
 
-              <View className="bg-black/10 backdrop-blur-lg px-4 py-2 rounded-full border border-white/10">
-                <Text className="text-white font-medium">
-                  {lines.length ? `${index + 1}/${lines.length}` : "–"}
+              <View className="px-4 py-2">
+                <Text className="text-white font-bold text-base">
+                  {lines.length ? `${index + 1} / ${lines.length}` : "–"}
                 </Text>
               </View>
 
               <Pressable
                 disabled={isAtEnd || !canNavigate}
                 onPress={onNext}
-                className={`flex-1 py-4 rounded-2xl justify-center items-center mx-1 ${isAtEnd || !canNavigate
-                  ? "bg-gray-200/50"
-                  : "bg-white/60 backdrop-blur-xl border border-white/20 shadow-lg"
-                  }`}
+                className="flex-1 py-3 rounded-xl items-center justify-center flex-row gap-2"
+                style={{
+                  backgroundColor: isAtEnd || !canNavigate ? "transparent" : "rgba(255,255,255,0.15)",
+                }}
               >
                 <Text
-                  className={`font-bold ${isAtEnd || !canNavigate ? "text-gray-400" : "text-slate-700"
-                    }`}
+                  className={`font-semibold ${isAtEnd || !canNavigate ? "text-white/30" : "text-white"}`}
                 >
-                  Next ▶
+                  Next
                 </Text>
+                <Ionicons
+                  name="chevron-forward"
+                  size={18}
+                  color={isAtEnd || !canNavigate ? "rgba(255,255,255,0.3)" : "white"}
+                />
               </Pressable>
             </View>
           </View>
-        </View>
+        </LinearGradient>
       </ImageBackground>
     </>
   );

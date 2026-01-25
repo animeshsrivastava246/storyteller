@@ -1,9 +1,10 @@
-// app/index.tsx
-import { GlassContainer, GlassView } from 'expo-glass-effect';
+import { GlassContainer, GlassView } from "expo-glass-effect";
+import { LinearGradient } from "expo-linear-gradient";
 import { router, Stack } from "expo-router";
 import { useCallback, useRef, useState } from "react";
 import {
   Alert,
+  ImageBackground,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -13,20 +14,10 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { HeaderIconButton } from "../components/HeaderIconButton";
-import "../global.css";
-import { saveStory } from "../utils/history";
+import { HeaderIconButton } from "@/components/HeaderIconButton";
+import { saveStory } from "@/utils/history";
+import "@/global.css";
 
-export function useIndexHeader() {
-  return {
-    headerRight: () => (
-      <HeaderIconButton
-        icon="time-outline"
-        onPress={() => router.push("/history")}
-      />
-    ),
-  };
-}
 
 export default function HomeScreen() {
   const [seed, setSeed] = useState("");
@@ -74,7 +65,6 @@ export default function HomeScreen() {
 
   return (
     <>
-
       <Stack.Screen
         options={{
           headerRight: () => (
@@ -87,83 +77,83 @@ export default function HomeScreen() {
           headerTitle: "",
         }}
       />
-      <View className="flex-1 bg-[#0b0f1a]">
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
+      <ImageBackground
+        source={require("@/assets/images/bg.webp")}
+        resizeMode="cover"
+        className="flex-1"
+      >
+        <LinearGradient
+          colors={["rgba(11,15,26,0.85)", "rgba(11,15,26,0.95)"]}
           className="flex-1"
         >
-          <ScrollView
-            contentContainerClassName="flex-1 justify-center px-6"
-            keyboardShouldPersistTaps="handled"
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            className="flex-1"
           >
-            {/* Title */}
-            <View className="mb-10">
-              <Text className="text-4xl font-semibold text-white text-center">
-                Create a Story
-              </Text>
-              <Text className="mt-2 text-center text-white/60">
-                One sentence is enough to wake a universe.
-              </Text>
-            </View>
-
-            {/* Glass Card */}
-            <GlassContainer
-              className="rounded-3xl overflow-hidden"
-            // intensity={55}
-            // tint="dark"
+            <ScrollView
+              contentContainerClassName="flex-1 justify-center px-6"
+              keyboardShouldPersistTaps="handled"
             >
-              <GlassView className="py-1 px-10 border border-white/20">
-                <TextInput
-                  ref={inputRef}
-                  value={seed}
-                  onChangeText={setSeed}
-                  editable={!isGenerating}
-                  placeholder="I found a staircase hidden beneath the sea..."
-                  placeholderTextColor="#9ca3af"
-                  multiline
-                  textAlignVertical="center"
-                  returnKeyType="send"
-                  submitBehavior="blurAndSubmit"
-                  onSubmitEditing={handleGenerate}
-                  className="text-lg text-white leading-relaxed"
-                />
-              </GlassView>
-            </GlassContainer>
+              {/* Title */}
+              <View className="mb-10 items-center">
+                <Text className="text-4xl font-bold text-white text-center">
+                  Create a Story
+                </Text>
+                <Text className="mt-3 text-center text-white/60 text-base">
+                  One sentence is enough to wake a universe.
+                </Text>
+              </View>
 
-            {/* Action */}
-            <Pressable
-              onPress={handleGenerate}
-              disabled={isGenerating}
-              className={`mt-8 rounded-2xl py-4 items-center ${isGenerating
-                ? "bg-white/20"
-                : "bg-indigo-600 active:bg-indigo-500"
+              {/* Glass Card */}
+              <GlassContainer className="rounded-3xl overflow-hidden">
+                <GlassView className="py-4 px-6 border border-white/20">
+                  <TextInput
+                    ref={inputRef}
+                    value={seed}
+                    onChangeText={setSeed}
+                    editable={!isGenerating}
+                    placeholder="I found a staircase hidden beneath the sea..."
+                    placeholderTextColor="rgba(255,255,255,0.4)"
+                    multiline
+                    numberOfLines={3}
+                    textAlignVertical="top"
+                    returnKeyType="send"
+                    submitBehavior="blurAndSubmit"
+                    onSubmitEditing={handleGenerate}
+                    className="text-lg text-white leading-relaxed min-h-[80px]"
+                  />
+                </GlassView>
+              </GlassContainer>
+
+              {/* Generate Button - Liquid Glass */}
+              <Pressable
+                onPress={handleGenerate}
+                disabled={isGenerating}
+                className={`mt-8 rounded-2xl py-4 items-center border ${
+                  isGenerating
+                    ? "bg-white/10 border-white/10"
+                    : "bg-indigo-600/80 border-indigo-400/30 active:bg-indigo-500"
                 }`}
-            >
-              <Text className="text-white font-semibold text-lg">
-                {isGenerating ? "Generating…" : "Generate Story"}
-              </Text>
-            </Pressable>
-            {/* Test Screen */}
-            <Pressable
-              onPress={() => router.push({
-                pathname: "/test",
-              })}
-              className="mt-8 rounded-2xl py-4 items-center 
-                bg-white /20
-                "
-            >
-              <Text className="text-black font-semibold text-2xl">
-                Test
-              </Text>
-            </Pressable>
+                style={{
+                  shadowColor: "#6366f1",
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: isGenerating ? 0 : 0.3,
+                  shadowRadius: 12,
+                }}
+              >
+                <Text className="text-white font-semibold text-lg">
+                  {isGenerating ? "Generating…" : "Generate Story"}
+                </Text>
+              </Pressable>
 
-            {/* Footer hint */}
-            <Text className="mt-6 text-center text-white/40 text-sm">
-              Tip: Specific images beat abstract ideas.
-            </Text>
-          </ScrollView>
-        </KeyboardAvoidingView>
-      </View >
+              {/* Footer hint */}
+              <Text className="mt-8 text-center text-white/40 text-sm">
+                Tip: Specific images beat abstract ideas.
+              </Text>
+            </ScrollView>
+          </KeyboardAvoidingView>
+        </LinearGradient>
+      </ImageBackground>
     </>
   );
 }
