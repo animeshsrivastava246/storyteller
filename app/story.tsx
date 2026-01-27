@@ -106,7 +106,7 @@ export default function Story() {
   const isAtStart = index === 0;
   const isAtEnd = index === lines.length - 1 || lines.length === 0;
 
-  // ✅ Disable nav until image for current index is loaded
+  // Disable nav until image for current index is loaded
   const canNavigate = !isLoadingImages && currentImgUrl !== null;
 
   return (
@@ -130,7 +130,7 @@ export default function Story() {
       >
         <LinearGradient
           colors={["rgba(0,0,0,0.3)", "rgba(0,0,0,0.5)"]}
-          className="flex-1"
+          style={{ flex: 1 }}
         >
           {/* Back Button - Liquid Glass */}
           <Pressable

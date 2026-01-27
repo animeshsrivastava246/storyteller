@@ -1,3 +1,6 @@
+import { HeaderIconButton } from "@/components/HeaderIconButton";
+import "@/global.css";
+import { saveStory } from "@/utils/history";
 import { GlassContainer, GlassView } from "expo-glass-effect";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, Stack } from "expo-router";
@@ -6,17 +9,12 @@ import {
   Alert,
   ImageBackground,
   Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
+  KeyboardAvoidingView, Platform, Pressable,
   ScrollView,
   Text,
   TextInput,
-  View,
+  View
 } from "react-native";
-import { HeaderIconButton } from "@/components/HeaderIconButton";
-import { saveStory } from "@/utils/history";
-import "@/global.css";
 
 
 export default function HomeScreen() {
@@ -82,9 +80,10 @@ export default function HomeScreen() {
         resizeMode="cover"
         className="flex-1"
       >
+        
         <LinearGradient
-          colors={["rgba(11,15,26,0.85)", "rgba(11,15,26,0.95)"]}
-          className="flex-1"
+          colors={["rgba(11,15,26,0.75)", "rgba(11,15,26,0.25)"]}
+          style={{ flex: 1 }}
         >
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : undefined}

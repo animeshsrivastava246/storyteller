@@ -46,6 +46,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "ac04d825-61b7-4174-b4f1-745bee3a6569"
+      }
+    },
+    "owner": "loomin-ai"
   }
 }
