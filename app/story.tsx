@@ -124,7 +124,7 @@ export default function Story() {
         }}
       />
       <ImageBackground
-        source={require("@/assets/images/bg.webp")}
+        source={require("@/assets/chateau.jpeg")}
         resizeMode="cover"
         className="flex-1"
       >

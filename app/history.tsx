@@ -1,10 +1,10 @@
+import { StoryCard } from "@/components/StoryCard";
+import type { StoryEntry } from "@/types/story";
+import { getHistory } from "@/utils/history";
 import { useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useCallback, useState } from "react";
 import { FlatList, ImageBackground, Text, View } from "react-native";
-import { StoryCard } from "@/components/StoryCard";
-import { getHistory } from "@/utils/history";
-import type { StoryEntry } from "@/types/story";
 
 function EmptyState() {
   return (
@@ -50,7 +50,7 @@ export default function History() {
 
   return (
     <ImageBackground
-      source={require("@/assets/images/bg.webp")}
+      source={require("@/assets/chateau.jpeg")}
       resizeMode="cover"
       className="flex-1"
     >

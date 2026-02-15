@@ -6,14 +6,14 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router, Stack } from "expo-router";
 import { useCallback, useRef, useState } from "react";
 import {
-  Alert,
-  ImageBackground,
-  Keyboard,
-  KeyboardAvoidingView, Platform, Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View
+    Alert,
+    ImageBackground,
+    Keyboard,
+    KeyboardAvoidingView, Platform, Pressable,
+    ScrollView,
+    Text,
+    TextInput,
+    View
 } from "react-native";
 
 
@@ -76,7 +76,7 @@ export default function HomeScreen() {
         }}
       />
       <ImageBackground
-        source={require("@/assets/images/bg.webp")}
+        source={require("@/assets/chateau.jpeg")}
         resizeMode="cover"
         className="flex-1"
       >
