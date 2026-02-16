@@ -31,8 +31,7 @@ export async function saveStory(
     const ids = await db.getAllAsync<{ id: string }>(
       `SELECT id FROM stories
        ORDER BY created_at DESC
-       LIMIT ?`,
-      [MAX_HISTORY_ENTRIES]
+       LIMIT ${MAX_HISTORY_ENTRIES}`
     );
 
     if (ids.length === 0) return;
@@ -64,8 +63,7 @@ export async function getHistory(): Promise<StoryEntry[]> {
     `SELECT *
      FROM stories
      ORDER BY created_at DESC
-     LIMIT ?`,
-    [MAX_HISTORY_ENTRIES]
+     LIMIT ${MAX_HISTORY_ENTRIES}`
   );
 
   return rows.map(row => ({

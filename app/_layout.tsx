@@ -37,7 +37,9 @@ export default function RootLayout() {
           presentation: Platform.OS === "ios" ? "formSheet" : "modal",
           sheetGrabberVisible: true,
           sheetAllowedDetents: [0.5, 1],
-          headerShown: false,
+          headerShown: true,
+          headerTransparent: true,
+          headerTitle: "",
           contentStyle: { backgroundColor: "transparent" },
         }}
       />

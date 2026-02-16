@@ -6,15 +6,15 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router, Stack } from "expo-router";
 import { useCallback, useRef, useState } from "react";
 import {
-    Alert,
-    ImageBackground,
-    Keyboard,
-    KeyboardAvoidingView, Platform, Pressable,
-    ScrollView,
-    Text,
-    TextInput,
-    View
+  Alert,
+  ImageBackground,
+  Keyboard,
+  KeyboardAvoidingView, Platform, Pressable,
+  ScrollView,
+  Text,
+  TextInput
 } from "react-native";
+import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 
 
 export default function HomeScreen() {
@@ -80,9 +80,9 @@ export default function HomeScreen() {
         resizeMode="cover"
         className="flex-1"
       >
-        
+
         <LinearGradient
-          colors={["rgba(11,15,26,0.75)", "rgba(11,15,26,0.25)"]}
+          colors={["rgba(11,15,26,0.9)", "rgba(11,15,26,0.7)"]}
           style={{ flex: 1 }}
         >
           <KeyboardAvoidingView
@@ -94,54 +94,59 @@ export default function HomeScreen() {
               keyboardShouldPersistTaps="handled"
             >
               {/* Title */}
-              <View className="mb-10 items-center">
-                <Text className="text-4xl font-bold text-white text-center">
-                  Create a Story
+              <Animated.View
+                entering={FadeInDown.duration(800).delay(200)}
+                className="mb-10 items-center"
+              >
+                <Text className="text-5xl font-bold text-white text-center tracking-tight shadow-neon-cyan">
+                  Story<Text className="text-neon-cyan">teller</Text>
                 </Text>
-                <Text className="mt-3 text-center text-white/60 text-base">
-                  One sentence is enough to wake a universe.
+                <Text className="mt-4 text-center text-white/70 text-lg font-medium">
+                  Awake a universe with a single line.
                 </Text>
-              </View>
+              </Animated.View>
 
               {/* Glass Card */}
-              <GlassContainer className="rounded-3xl overflow-hidden">
-                <GlassView className="py-4 px-6 border border-white/20">
-                  <TextInput
-                    ref={inputRef}
-                    value={seed}
-                    onChangeText={setSeed}
-                    editable={!isGenerating}
-                    placeholder="I found a staircase hidden beneath the sea..."
-                    placeholderTextColor="rgba(255,255,255,0.4)"
-                    multiline
-                    numberOfLines={3}
-                    textAlignVertical="top"
-                    returnKeyType="send"
-                    submitBehavior="blurAndSubmit"
-                    onSubmitEditing={handleGenerate}
-                    className="text-lg text-white leading-relaxed min-h-[80px]"
-                  />
-                </GlassView>
-              </GlassContainer>
+              <Animated.View entering={FadeInUp.duration(600).delay(400)}>
+                <GlassContainer className="rounded-3xl overflow-hidden">
+                  <GlassView className="py-4 px-6 border border-white/20">
+                    <TextInput
+                      ref={inputRef}
+                      value={seed}
+                      onChangeText={setSeed}
+                      editable={!isGenerating}
+                      placeholder="I found a staircase hidden beneath the sea..."
+                      placeholderTextColor="rgba(255,255,255,0.4)"
+                      multiline
+                      numberOfLines={3}
+                      textAlignVertical="top"
+                      returnKeyType="send"
+                      submitBehavior="blurAndSubmit"
+                      onSubmitEditing={handleGenerate}
+                      className="text-lg text-white leading-relaxed min-h-[80px]"
+                    />
+                  </GlassView>
+                </GlassContainer>
+              </Animated.View>
 
               {/* Generate Button - Liquid Glass */}
               <Pressable
                 onPress={handleGenerate}
                 disabled={isGenerating}
-                className={`mt-8 rounded-2xl py-4 items-center border ${
-                  isGenerating
-                    ? "bg-white/10 border-white/10"
-                    : "bg-indigo-600/80 border-indigo-400/30 active:bg-indigo-500"
-                }`}
+                className={`mt-10 rounded-2xl py-5 items-center border-2 ${isGenerating
+                  ? "bg-white/5 border-white/10"
+                  : "bg-indigo-600/90 border-neon-cyan active:bg-indigo-500"
+                  }`}
                 style={{
-                  shadowColor: "#6366f1",
-                  shadowOffset: { width: 0, height: 4 },
-                  shadowOpacity: isGenerating ? 0 : 0.3,
-                  shadowRadius: 12,
+                  shadowColor: isGenerating ? "transparent" : "#00F3FF",
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: isGenerating ? 0 : 0.6,
+                  shadowRadius: 15,
+                  elevation: isGenerating ? 0 : 10,
                 }}
               >
-                <Text className="text-white font-semibold text-lg">
-                  {isGenerating ? "Generating…" : "Generate Story"}
+                <Text className="text-white font-bold text-xl uppercase tracking-widest">
+                  {isGenerating ? "Synthesizing…" : "Initiate Story"}
                 </Text>
               </Pressable>
 

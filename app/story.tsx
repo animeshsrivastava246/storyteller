@@ -76,10 +76,10 @@ export default function Story() {
           }
 
           const { imgUrl } = await res.json();
-          
+
           // Cache the image
           await cacheImage(line.prompt, imgUrl);
-          
+
           return imgUrl;
         })
       );
@@ -132,37 +132,19 @@ export default function Story() {
           colors={["rgba(0,0,0,0.3)", "rgba(0,0,0,0.5)"]}
           style={{ flex: 1 }}
         >
-          {/* Back Button - Liquid Glass */}
-          <Pressable
-            onPress={() => router.back()}
-            className="absolute top-14 left-4 z-10 size-11 rounded-full items-center justify-center"
-            style={{
-              backgroundColor: "rgba(255,255,255,0.15)",
-              borderWidth: 1,
-              borderColor: "rgba(255,255,255,0.2)",
-            }}
-          >
-            <Ionicons name="chevron-back" size={24} color="white" />
-          </Pressable>
-
           {/* Main Content */}
           <View className="flex-1 justify-center items-center px-6 pt-20 pb-32">
             {isLoadingImages ? (
               <View
-                className="rounded-3xl items-center justify-center p-8"
-                style={{
-                  backgroundColor: "rgba(255,255,255,0.1)",
-                  borderWidth: 1,
-                  borderColor: "rgba(255,255,255,0.2)",
-                  width: IMAGE_WIDTH,
-                }}
+                className="rounded-3xl items-center justify-center p-8 glass"
+                style={{ width: IMAGE_WIDTH }}
               >
-                <ActivityIndicator size="large" color="white" />
-                <Text className="text-lg font-medium text-white text-center mt-4">
-                  Painting your story&apos;s scenes...
+                <ActivityIndicator size="large" color="#00F3FF" />
+                <Text className="text-xl font-bold neon-text-cyan text-center mt-6">
+                  SYNTHESIZING SCENES
                 </Text>
-                <Text className="text-sm text-white/60 text-center mt-2">
-                  This may take a moment 🎨
+                <Text className="text-sm text-white/50 text-center mt-2 tracking-widest uppercase">
+                  Neural engine at work... 🧬
                 </Text>
               </View>
             ) : error ? (
@@ -194,12 +176,13 @@ export default function Story() {
                   style={{
                     borderRadius: 24,
                     overflow: "hidden",
-                    borderWidth: 1,
-                    borderColor: "rgba(255,255,255,0.2)",
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 12 },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 24,
+                    borderWidth: 2,
+                    borderColor: "#00F3FF",
+                    shadowColor: "#00F3FF",
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.5,
+                    shadowRadius: 20,
+                    elevation: 10,
                   }}
                 >
                   {currentImgUrl ? (
@@ -227,15 +210,10 @@ export default function Story() {
 
                 {/* Story Text - Glass Card */}
                 <View
-                  className="mt-6 rounded-2xl px-6 py-4"
-                  style={{
-                    backgroundColor: "rgba(255,255,255,0.1)",
-                    borderWidth: 1,
-                    borderColor: "rgba(255,255,255,0.2)",
-                    width: IMAGE_WIDTH,
-                  }}
+                  className="mt-8 rounded-2xl px-6 py-5 glass"
+                  style={{ width: IMAGE_WIDTH }}
                 >
-                  <Text className="text-white text-lg font-medium text-center leading-relaxed">
+                  <Text className="text-white text-xl font-medium text-center leading-relaxed">
                     {currentLine?.text || "✨ Your imagination, visualized."}
                   </Text>
                 </View>
@@ -244,37 +222,30 @@ export default function Story() {
           </View>
 
           {/* Navigation Controls - Liquid Glass */}
-          <View className="absolute bottom-8 left-4 right-4">
-            <View
-              className="flex-row items-center justify-between rounded-2xl p-2"
-              style={{
-                backgroundColor: "rgba(255,255,255,0.1)",
-                borderWidth: 1,
-                borderColor: "rgba(255,255,255,0.2)",
-              }}
-            >
+          <View className="absolute bottom-10 left-4 right-4">
+            <View className="flex-row items-center justify-between rounded-3xl p-2 glass">
               <Pressable
                 disabled={isAtStart || !canNavigate}
                 onPress={onPrevious}
-                className="flex-1 py-3 rounded-xl items-center justify-center flex-row gap-2"
+                className="flex-1 py-4 rounded-2xl items-center justify-center flex-row gap-2"
                 style={{
-                  backgroundColor: isAtStart || !canNavigate ? "transparent" : "rgba(255,255,255,0.15)",
+                  backgroundColor: isAtStart || !canNavigate ? "transparent" : "rgba(255,255,255,0.1)",
                 }}
               >
                 <Ionicons
                   name="chevron-back"
-                  size={18}
-                  color={isAtStart || !canNavigate ? "rgba(255,255,255,0.3)" : "white"}
+                  size={20}
+                  color={isAtStart || !canNavigate ? "rgba(255,255,255,0.2)" : "#00F3FF"}
                 />
                 <Text
-                  className={`font-semibold ${isAtStart || !canNavigate ? "text-white/30" : "text-white"}`}
+                  className={`font-bold uppercase tracking-widest ${isAtStart || !canNavigate ? "text-white/20" : "text-white"}`}
                 >
-                  Previous
+                  Prev
                 </Text>
               </Pressable>
 
-              <View className="px-4 py-2">
-                <Text className="text-white font-bold text-base">
+              <View className="px-6">
+                <Text className="text-neon-cyan font-black text-lg">
                   {lines.length ? `${index + 1} / ${lines.length}` : "–"}
                 </Text>
               </View>
@@ -282,20 +253,20 @@ export default function Story() {
               <Pressable
                 disabled={isAtEnd || !canNavigate}
                 onPress={onNext}
-                className="flex-1 py-3 rounded-xl items-center justify-center flex-row gap-2"
+                className="flex-1 py-4 rounded-2xl items-center justify-center flex-row gap-2"
                 style={{
-                  backgroundColor: isAtEnd || !canNavigate ? "transparent" : "rgba(255,255,255,0.15)",
+                  backgroundColor: isAtEnd || !canNavigate ? "transparent" : "rgba(255,255,255,0.1)",
                 }}
               >
                 <Text
-                  className={`font-semibold ${isAtEnd || !canNavigate ? "text-white/30" : "text-white"}`}
+                  className={`font-bold uppercase tracking-widest ${isAtEnd || !canNavigate ? "text-white/20" : "text-white"}`}
                 >
                   Next
                 </Text>
                 <Ionicons
                   name="chevron-forward"
-                  size={18}
-                  color={isAtEnd || !canNavigate ? "rgba(255,255,255,0.3)" : "white"}
+                  size={20}
+                  color={isAtEnd || !canNavigate ? "rgba(255,255,255,0.2)" : "#00F3FF"}
                 />
               </Pressable>
             </View>
