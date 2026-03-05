@@ -1,7 +1,8 @@
 import { HeaderIconButton } from "@/components/HeaderIconButton";
 import "@/global.css";
+import { generateStory } from "@/utils/apiClient";
 import { saveStory } from "@/utils/history";
-import { GlassContainer, GlassView } from "expo-glass-effect";
+import { GlassView } from "expo-glass-effect";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, Stack } from "expo-router";
 import { useCallback, useRef, useState } from "react";
@@ -12,7 +13,8 @@ import {
   KeyboardAvoidingView, Platform, Pressable,
   ScrollView,
   Text,
-  TextInput
+  TextInput,
+  View
 } from "react-native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 
@@ -35,19 +37,8 @@ export default function HomeScreen() {
     Keyboard.dismiss();
 
     try {
-      const res = await fetch("/api/story", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ seed: trimmed }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok || !Array.isArray(data.story) || data.story.length === 0) {
-        throw new Error(data?.error ?? "Story generation failed.");
-      }
-
-      await saveStory(trimmed, data.story);
+      const story = await generateStory(trimmed);
+      await saveStory(trimmed, story);
 
       router.push({
         pathname: "/story",
@@ -108,44 +99,76 @@ export default function HomeScreen() {
 
               {/* Glass Card */}
               <Animated.View entering={FadeInUp.duration(600).delay(400)}>
-                <GlassContainer className="rounded-3xl overflow-hidden">
-                  <GlassView className="py-4 px-6 border border-white/20">
+                <View
+                  className="rounded-3xl overflow-hidden"
+                  style={{
+                    backgroundColor: "rgba(10, 15, 35, 0.45)",
+                    borderWidth: 1,
+                    borderColor: "rgba(255, 255, 255, 0.15)",
+                    borderTopColor: "rgba(255, 255, 255, 0.3)",
+                    borderLeftColor: "rgba(255, 255, 255, 0.2)",
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 10 },
+                    shadowOpacity: 0.5,
+                    shadowRadius: 20,
+                  }}
+                >
+                  <GlassView className="py-6 px-6">
                     <TextInput
                       ref={inputRef}
                       value={seed}
                       onChangeText={setSeed}
                       editable={!isGenerating}
                       placeholder="I found a staircase hidden beneath the sea..."
-                      placeholderTextColor="rgba(255,255,255,0.4)"
+                      placeholderTextColor="rgba(200, 220, 255, 0.5)"
                       multiline
-                      numberOfLines={3}
+                      numberOfLines={4}
                       textAlignVertical="top"
                       returnKeyType="send"
                       submitBehavior="blurAndSubmit"
                       onSubmitEditing={handleGenerate}
-                      className="text-lg text-white leading-relaxed min-h-[80px]"
+                      className="text-xl text-white font-medium leading-relaxed min-h-[120px]"
                     />
                   </GlassView>
-                </GlassContainer>
+                </View>
               </Animated.View>
 
-              {/* Generate Button - Liquid Glass */}
+              {/* Generate Button - Liquid Neon */}
               <Pressable
                 onPress={handleGenerate}
                 disabled={isGenerating}
-                className={`mt-10 rounded-2xl py-5 items-center border-2 ${isGenerating
-                  ? "bg-white/5 border-white/10"
-                  : "bg-indigo-600/90 border-neon-cyan active:bg-indigo-500"
+                className={`mt-12 rounded-[28px] py-5 items-center justify-center overflow-hidden ${isGenerating
+                  ? "bg-white/5 border border-white/10"
+                  : "bg-indigo-600/50 border-[1.5px] border-neon-cyan"
                   }`}
-                style={{
+                style={({ pressed }) => ({
+                  transform: [{ scale: pressed && !isGenerating ? 0.97 : 1 }],
                   shadowColor: isGenerating ? "transparent" : "#00F3FF",
                   shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: isGenerating ? 0 : 0.6,
-                  shadowRadius: 15,
-                  elevation: isGenerating ? 0 : 10,
-                }}
+                  shadowOpacity: isGenerating ? 0 : 0.8,
+                  shadowRadius: 25,
+                  elevation: isGenerating ? 0 : 15,
+                  backgroundColor: isGenerating ? "rgba(255,255,255,0.05)" : pressed ? "rgba(0, 243, 255, 0.2)" : "rgba(11, 20, 50, 0.6)",
+                })}
               >
-                <Text className="text-white font-bold text-xl uppercase tracking-widest">
+                {/* Optional inner glow layer for button */}
+                {!isGenerating && (
+                  <LinearGradient
+                    colors={["rgba(0,243,255,0.4)", "transparent"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 0, y: 1 }}
+                    style={{ position: "absolute", top: 0, left: 0, right: 0, height: "100%" }}
+                  />
+                )}
+                <Text
+                  className={`font-black text-xl tracking-[0.15em] uppercase ${isGenerating ? "text-white/50" : "text-white"
+                    }`}
+                  style={{
+                    textShadowColor: isGenerating ? "transparent" : "rgba(0,243,255,0.8)",
+                    textShadowOffset: { width: 0, height: 0 },
+                    textShadowRadius: 10,
+                  }}
+                >
                   {isGenerating ? "Synthesizing…" : "Initiate Story"}
                 </Text>
               </Pressable>

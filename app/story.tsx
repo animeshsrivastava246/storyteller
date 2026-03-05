@@ -1,7 +1,7 @@
 import { HeaderIconButton } from "@/components/HeaderIconButton";
 import type { StoryLine } from "@/types/story";
+import { generateImage } from "@/utils/apiClient";
 import { getLatestStory } from "@/utils/history";
-import { cacheImage, getCachedImage } from "@/utils/imageCache";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
@@ -58,30 +58,7 @@ export default function Story() {
 
     try {
       const urls = await Promise.allSettled(
-        lines.map(async (line) => {
-          // Check cache first
-          const cached = await getCachedImage(line.prompt);
-          if (cached) return cached;
-
-          // Fetch from API
-          const res = await fetch("/api/image", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ prompt: line.prompt }),
-          });
-
-          if (!res.ok) {
-            const err = await res.json().catch(() => ({ error: "Image gen failed" }));
-            throw new Error(err.error || `HTTP ${res.status}`);
-          }
-
-          const { imgUrl } = await res.json();
-
-          // Cache the image
-          await cacheImage(line.prompt, imgUrl);
-
-          return imgUrl;
-        })
+        lines.map((line) => generateImage(line.prompt))
       );
 
       const newUrls = urls.map((result) => (result.status === "fulfilled" ? result.value : null));
