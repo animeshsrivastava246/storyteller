@@ -8,9 +8,14 @@
     "scheme": "storyteller",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.loominai.storyteller",
+      "buildNumber": "1.0.0"
+
     },
     "android": {
+      "package": "com.loominai.storyteller",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
